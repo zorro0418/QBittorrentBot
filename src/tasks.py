@@ -9,6 +9,7 @@ from src.redis_helper.wrapper import RedisWrapper
 from src.client_manager.client_repo import ClientRepo
 from src.settings import Settings
 from src.settings.user import User
+from src.bot.middlewares.custom_i18n import CustomI18nMiddleware
 
 
 logger = getLogger(__name__)
@@ -23,7 +24,7 @@ def user_filters(users: list[User], category: str):
             yield user
 
 
-async def torrent_finished(bot: Bot, redis: RedisWrapper, settings: Settings):
+async def torrent_finished(bot: Bot, redis: RedisWrapper, settings: Settings, i18n_middleware: CustomI18nMiddleware):
     repository_class = ClientRepo.get_client_manager(settings.client.type)
 
     for i in await repository_class(settings).get_torrents(status_filter="completed"):
@@ -32,14 +33,18 @@ async def torrent_finished(bot: Bot, redis: RedisWrapper, settings: Settings):
             for user in user_filters(settings.users, i.category):
                 if user.notify:
                     try:
-                        await bot.send_message(
-                            user.user_id, 
-                            _("Torrent {name} has finished downloading!"
-                                .format(
-                                    name=i.name
+                        with i18n_middleware.i18n.context() as ctx:
+                            user_lang = user.locale if user.locale else ctx.default_locale
+
+                            ctx.use_locale(user_lang)
+                            await bot.send_message(
+                                user.user_id, 
+                                _("Torrent {name} has finished downloading!"
+                                    .format(
+                                        name=i.name
+                                    )
                                 )
                             )
-                        )
                     except Exception as e:
                         logger.exception(e)
 
