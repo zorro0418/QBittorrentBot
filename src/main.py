@@ -75,7 +75,7 @@ async def main(base_path: Path) -> None:
 
     # create torrent_finished job
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(torrent_finished, "interval", args=[bot, redis_client, settings], seconds=60)
+    scheduler.add_job(torrent_finished, "interval", args=[bot, redis_client, settings, CustomI18nMiddleware(i18n)], seconds=60)
     scheduler.start()
 
     # create background task for file watching
