@@ -79,7 +79,6 @@ async def list_active_torrents(
     callback: Optional[str] = None,
     status_filter: Optional[str] = None
 ) -> None:
-    user = get_user_from_config(chat_id, settings)
     repository_class = ClientRepo.get_client_manager(settings.client.type)
     torrents = await repository_class(settings).get_torrents(status_filter=status_filter)
 
@@ -133,9 +132,9 @@ async def list_active_torrents(
     # Torrent buttons
     for torrent in torrents:
         if callback:
-            buttons.append([InlineKeyboardButton(text=torrent.name, callback_data=f"{callback}:{torrent.hash}")])
+            buttons.append([InlineKeyboardButton(text=torrent.name[:40], callback_data=f"{callback}:{torrent.hash}")])
         else:
-            buttons.append([InlineKeyboardButton(text=torrent.name, callback_data=TorrentInfo(torrent_hash=torrent.hash).pack())])
+            buttons.append([InlineKeyboardButton(text=torrent.name[:40], callback_data=TorrentInfo(torrent_hash=torrent.hash).pack())])
 
     buttons.append([InlineKeyboardButton(text=_("🔙 Menu"), callback_data="menu")])
     markup = InlineKeyboardMarkup(inline_keyboard=buttons)
