@@ -1,18 +1,19 @@
-name: Export Moerats Image
+name: Force Pull Moerats Image
 on:
   workflow_dispatch: # 手动触发
 
 jobs:
-  build-and-export:
+  pull-and-export:
     runs-on: ubuntu-latest
     steps:
-      - name: Pull Moerats Image
+      - name: Force Pull from Registry
+        # 即使网页搜不到，只要镜像还在库里，这行命令就能强制下载
         run: docker pull moerats/qbittorrentbot:latest
 
-      - name: Save Image to Tar
+      - name: Save Image to Tar File
         run: docker save moerats/qbittorrentbot:latest > moerats_qbot.tar
 
-      - name: Upload Artifact
+      - name: Upload to GitHub Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: moerats-package
