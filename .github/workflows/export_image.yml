@@ -1,0 +1,23 @@
+name: Manual Build and Export
+on:
+  workflow_dispatch: # 允许你手动点击运行
+
+jobs:
+  build-and-export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t qbot:latest .
+
+      - name: Save Docker Image to Tar
+        run: docker save qbot:latest > qbot_image.tar
+
+      - name: Upload Image Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qb-bot-image-file
+          path: qbot_image.tar
+          retention-days: 1
