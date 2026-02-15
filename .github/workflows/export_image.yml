@@ -1,20 +1,23 @@
-name: Export New Qbot Image
+name: Final Qbot Export
 on:
   workflow_dispatch:
 
 jobs:
-  pull-and-export:
+  build-and-export:
     runs-on: ubuntu-latest
     steps:
-      - name: Pull New Image
-        # 换成这个目前确定存活且好用的镜像
-        run: docker pull ddsderek/xiaoya-qbittorrent-bot:latest
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: Save Image
-        run: docker save ddsderek/xiaoya-qbittorrent-bot:latest > new_qbot.tar
+      - name: Build Local Image
+        # 直接根据仓库里的 Dockerfile 构建，不求人
+        run: docker build -t my-qbot:latest .
 
-      - name: Upload
+      - name: Save Image to Tar
+        run: docker save my-qbot:latest > my_qbot.tar
+
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: new-qbot-package
-          path: new_qbot.tar
+          name: qbot-final-package
+          path: my_qbot.tar
