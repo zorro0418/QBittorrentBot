@@ -1,23 +1,20 @@
-name: Manual Build and Export
+name: Export Moerats Image
 on:
-  workflow_dispatch: # 允许你手动点击运行
+  workflow_dispatch: # 手动触发
 
 jobs:
   build-and-export:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Pull Moerats Image
+        run: docker pull moerats/qbittorrentbot:latest
 
-      - name: Build Docker Image
-        run: docker build -t qbot:latest .
+      - name: Save Image to Tar
+        run: docker save moerats/qbittorrentbot:latest > moerats_qbot.tar
 
-      - name: Save Docker Image to Tar
-        run: docker save qbot:latest > qbot_image.tar
-
-      - name: Upload Image Artifact
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: qb-bot-image-file
-          path: qbot_image.tar
+          name: moerats-package
+          path: moerats_qbot.tar
           retention-days: 1
