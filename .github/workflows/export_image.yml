@@ -1,21 +1,20 @@
-name: Force Pull Moerats Image
+name: Export New Qbot Image
 on:
-  workflow_dispatch: # 手动触发
+  workflow_dispatch:
 
 jobs:
   pull-and-export:
     runs-on: ubuntu-latest
     steps:
-      - name: Force Pull from Registry
-        # 即使网页搜不到，只要镜像还在库里，这行命令就能强制下载
-        run: docker pull moerats/qbittorrentbot:latest
+      - name: Pull New Image
+        # 换成这个目前确定存活且好用的镜像
+        run: docker pull ddsderek/xiaoya-qbittorrent-bot:latest
 
-      - name: Save Image to Tar File
-        run: docker save moerats/qbittorrentbot:latest > moerats_qbot.tar
+      - name: Save Image
+        run: docker save ddsderek/xiaoya-qbittorrent-bot:latest > new_qbot.tar
 
-      - name: Upload to GitHub Artifacts
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: moerats-package
-          path: moerats_qbot.tar
-          retention-days: 1
+          name: new-qbot-package
+          path: new_qbot.tar
